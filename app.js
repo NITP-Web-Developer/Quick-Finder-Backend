@@ -11,6 +11,7 @@ var LoginBackend = require("./LoginBackend/signup");
 var BackSell = require("./backend/backsell");
 var MyServer = require("./mybackend/myserver.js");
 var Payment = require("./backend/order");
+const chatroutes=require("./server/chatroutes")
 app.use(logger("dev"));
 app.use(express.json());
 app.use(cookieParser());
@@ -18,6 +19,7 @@ app.use(cors());
 app.use("", LoginBackend);
 app.use("/backend", BackSell);
 app.use("", MyServer);
+app.use("",chatroutes)
 app.use("/payment", Payment);
 
 // catch 404 and forward to error handler

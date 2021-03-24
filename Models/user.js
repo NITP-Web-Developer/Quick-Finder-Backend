@@ -3,27 +3,30 @@ const schema = mongoose.Schema;
 
 const UserSchema = new schema({
     "name": {
-        type:String
+        type: String
     },
     "sname": {
-        type:String
+        type: String
     },
     "password": {
-        type:String
+        type: String
     },
     "mobile": {
-        type:Number
+        type: Number
     },
     "email": {
-        type:String
+        type: String
     },
-    "address":{
-        type:String
+    "address": {
+        type: String
     },
-    "activated":{
-        type:Boolean,
-        default:false
+    "activated": {
+        type: Boolean,
+        default: false
+    },
+    "chatid": {
+        type: Object
     }
 });
-const user = mongoose.model('Users',UserSchema);
+const user = mongoose.model('Users', UserSchema);
 module.exports = user;
