@@ -1,7 +1,6 @@
 var express = require("express");
 var app = express.Router();
 const nodemailer = require("nodemailer");
-const expressapp = express();
 var Users = require("../Models/user");
 var Chat = require("../Models/ChatSchema");
 var Buy = require("../Models/userProducts");
