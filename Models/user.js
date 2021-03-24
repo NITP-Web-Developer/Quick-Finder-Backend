@@ -25,7 +25,8 @@ const UserSchema = new schema({
         default: false
     },
     "chatid": {
-        type: Object
+        type: Object,
+        default:{}
     }
 });
 const user = mongoose.model('Users', UserSchema);
