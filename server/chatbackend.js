@@ -10,14 +10,14 @@ const Chatting = (http) => {
 
 
         socket.on('join', ({ userid, chatid }) => {
-            console.log("userid chatid", userid, chatid);
+            // console.log("join userid chatid", userid, chatid);
             users[userid] = true;
             socket.join(chatid);
             socket.broadcast.emit('online', users);
             socket.emit('friendsonline', users)
 
             socket.on('disconnect', () => {
-                console.log("Disconnected ",chatid,userid);
+                // console.log("Disconnected ", chatid, userid);
                 socket.leave(chatid)
                 users[userid] = false
                 console.log(users);
@@ -34,7 +34,7 @@ const Chatting = (http) => {
         })
 
         socket.on('newchat', ({ userid, chatid, chattingwith }) => {
-            console.log('newchat',userid,chatid,chattingwith);
+            console.log('newchat', userid, chatid, chattingwith);
             User.updateOne({ _id: userid },
                 {
                     $set: {
@@ -62,12 +62,12 @@ const Chatting = (http) => {
         })
 
         socket.on('type', ({ userid, chatid }) => {
-            // console.log(userid, chatid);
+            // console.log('typing', userid, chatid);
             socket.broadcast.to(chatid).emit('typing', { userid, chatid });
         })
 
         socket.on('send', ({ mes, id, chatId, type }) => {
-            // console.log(mes,id,chatId,type);
+            // console.log('send', mes, id, chatId, type);
             var d = new Date(Date.now());
 
             var chatDocument = {
@@ -91,17 +91,8 @@ const Chatting = (http) => {
                         }
                     }
                 }, { upsert: true }).then(() => {
-                    var both = chatId.split(id)
-                    // console.log(both);
-                    both.splice(both.indexOf(''), 1)
-                    // console.log(both[0]);
-                    if (users[both[0]]) {
-                        // console.log('user onnline');
-                        socket.broadcast.to(chatId).emit('receive', { mes, id, datetime, type, chatId });
-                    } else {
-                        // console.log('user offline');
-
-                    }
+                    // console.log('user onnline');
+                    socket.broadcast.to(chatId).emit('receive', { mes, id, datetime, type, chatId });
                 })
         })
     })

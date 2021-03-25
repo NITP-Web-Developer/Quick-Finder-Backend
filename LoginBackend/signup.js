@@ -135,7 +135,7 @@ app.post("/login", async (req, res) => {
 
   var loggedin = false;
 
-  Users.find({ email: email }).then((result) => {
+  await Users.find({ email: email }).then((result) => {
     bcrypt.compare(pass, result[0].password, function (err, password) {
       console.log(result);
       if (result[0].activated) {
