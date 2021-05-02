@@ -162,7 +162,7 @@ app.post("/signup", async (req, res) => {
   var mobile = req.body.signupDetails.mobile;
   var email = req.body.signupDetails.email;
   var address = req.body.signupDetails.address;
-  var id = "";
+
   await bcrypt.hash(password, saltRounds, function (err, hash) {
     let personDocument = {
       name: uname,
@@ -175,17 +175,13 @@ app.post("/signup", async (req, res) => {
 
     var user = new Users(personDocument);
 
-    Users.findOne({ email: email }).then(async (result) => {
+    Users.findOne({ email: email }).then((result) => {
       console.log(result);
       if (result !== null) {
         console.log("User Existing");
       } else {
         try {
-          await user.save().then((result) => {
-            console.log("result is here");
-
-            id = result._id;
-
+          user.save().then((result) => {
             var transporter = nodemailer.createTransport({
               service: "gmail",
               auth: {
@@ -212,8 +208,6 @@ app.post("/signup", async (req, res) => {
               }
             });
           });
-          // console.log(id);
-          // res.json({ Id: id });
         } catch (err) {
           console.log(err.stack);
         }

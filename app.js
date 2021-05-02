@@ -6,29 +6,20 @@ var logger = require("morgan");
 var bodyParser = require("body-parser");
 var cors = require("cors");
 require("dotenv").config();
-var fileUpload = require("express-fileupload");
-app.use(
-  fileUpload({
-    useTempFiles: true,
-    limits: { fileSize: 5 * 1024 * 1024 },
-  })
-);
-app.use(logger("dev"));
-app.use(express.json());
-app.use(cookieParser());
-app.use(cors());
-app.use(bodyParser());
 
 var LoginBackend = require("./LoginBackend/signup");
 var BackSell = require("./backend/backsell");
 var MyServer = require("./mybackend/myserver.js");
 var Payment = require("./backend/order");
-const chatroutes = require("./server/chatroutes");
-
+const chatroutes=require("./server/chatroutes")
+app.use(logger("dev"));
+app.use(express.json());
+app.use(cookieParser());
+app.use(cors());
 app.use("", LoginBackend);
 app.use("/backend", BackSell);
 app.use("", MyServer);
-app.use("", chatroutes);
+app.use("",chatroutes)
 app.use("/payment", Payment);
 
 // catch 404 and forward to error handler
