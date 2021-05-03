@@ -345,7 +345,7 @@ router.post("/userDetails", (req, res) => {
 
 router.post("/SellStatus", (req, res) => {
   var ProductID = req.body.ProductId;
-  var BuyerID = req.body.ButerId;
+  var BuyerID = req.body.BuyerId;
   async function run() {
     try {
       await mongodbclient.connect();
