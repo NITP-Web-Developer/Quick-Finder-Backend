@@ -66,9 +66,8 @@ router.post("/SellNow", (req, res) => {
   var Description = req.body.description;
   var seller = req.body.seller;
   const files = req.files.uploadFiles;
-  console.log(req.files.length);
+  console.log(req.files);
 
-  console.log(typeof files);
   async function run() {
     try {
       console.log("this is running");
@@ -150,8 +149,6 @@ router.post("/Products", (req, res, next) => {
       var productObject = {
         ProductId: productId,
         Time: new Date(),
-        Sold: false,
-        BuyerId: "",
       };
 
       var userproduct = userProduct({
@@ -264,6 +261,7 @@ router.post("/buy", (req, res) => {
   var sellerID = req.body.buyDetails.sellerID;
   var razorpay_orderID = req.body.buyDetails.razorpay_orderId;
   var orderID = req.body.buyDetails.orderId;
+  var ProductID = req.body.buyDetails.ProductId;
 
   async function run() {
     try {
@@ -274,6 +272,7 @@ router.post("/buy", (req, res) => {
 
       console.log(orderID.length);
       let buyDocument = {
+        ProductId: new ObjectID(ProductID),
         SellerId: new ObjectID(sellerID),
         orderId: new ObjectID(orderID),
         razorpay_orderId: razorpay_orderID,
@@ -339,6 +338,31 @@ router.post("/userDetails", (req, res) => {
     } catch {
       console.log("error in server side");
       res.send({ error: true });
+    }
+  }
+  run().catch(console.dir);
+});
+
+router.post("/SellStatus", (req, res) => {
+  var ProductID = req.body.ProductId;
+  var BuyerID = req.body.ButerId;
+  async function run() {
+    try {
+      await mongodbclient.connect();
+      console.log("connection is established !");
+      var database = mongodbclient.db("Quick_Finder");
+      var Buy = database.collection("sellProducts");
+
+      var ProductId = new ObjectID(ProductID);
+      var BuyerId = new ObjectID(BuyerID);
+
+      var result = Buy.updateOne(
+        { _id: ProductId },
+        { $set: { sold: true, buyer: BuyerId } }
+      );
+
+      res.send({ mes: "sucessfully change sold status" });
+    } finally {
     }
   }
   run().catch(console.dir);
