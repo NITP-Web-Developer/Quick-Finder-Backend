@@ -121,7 +121,7 @@ router.post("/SellNow", (req, res) => {
       );
       var ProductId = result1.insertedId.toString();
       console.log(ProductId);
-      res.send({ mess: "Product is added to sell ", ProductId: "product" });
+      res.send({ mess: "Product is added to sell ", ProductId: ProductId });
     } catch (err) {
       res.send("Error in  Uploading file");
       console.log(err);
