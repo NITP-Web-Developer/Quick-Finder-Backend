@@ -64,7 +64,7 @@ router.post("/SellNow", (req, res) => {
   var Status = req.body.status;
   var Price = req.body.price;
   var Description = req.body.description;
-  var seller = req.body.seller;
+  var sellerID = req.body.sellerId;
   const files = req.files.uploadFiles;
   console.log(req.files);
 
@@ -93,6 +93,7 @@ router.post("/SellNow", (req, res) => {
       await Promise.all(promises);
 
       console.log(sellImageUrl);
+      var sellerId = new ObjectID(sellerID);
       //  create a document to be inserted
       var sellproduct = sellProduct({
         product_images: sellImageUrl,
@@ -102,7 +103,7 @@ router.post("/SellNow", (req, res) => {
         price: Price,
         description: Description,
         sold: false,
-        seller: seller,
+        seller: sellerId,
         buyer: "",
       });
 
@@ -195,9 +196,7 @@ router.post("/usersellproduct", (req, res) => {
           try {
             for (var i = 0; i < result[0].sell.length; i++) {
               var sell = {};
-              sell.BuyerId = result[0].sell[i].BuyerId.toString();
               sell.ProductId = result[0].sell[i].ProductId.toString();
-              sell.Sold = result[0].sell[i].Sold.toString();
               sell.Time = result[0].sell[i].Time.toString();
               array.push(sell);
             }
@@ -278,14 +277,35 @@ router.post("/buy", (req, res) => {
         razorpay_orderId: razorpay_orderID,
         Time: new Date(),
       };
+      let sellDocument = {
+        ProductId: new ObjectID(ProductID),
+        BuyerId: new ObjectID(buyerID),
+        orderId: new ObjectID(orderID),
+        razorpay_orderId: razorpay_orderID,
+        Time: new Date(),
+      };
       console.log(buyDocument);
       var BuyerId = new ObjectID(buyerID);
-
-      var result = Buy.updateOne(
-        { _id: BuyerId },
-        { $addToSet: { purchased: buyDocument } },
-        { upsert: true }
-      );
+      var SellerId = new ObjectID(sellerID);
+      // var result = Buy.updateOne(
+      // { _id: BuyerId },
+      // { $addToSet: { purchased: buyDocument } },
+      // { upsert: true }
+      // );
+      Buy.bulkWrite([
+        {
+          updateOne: {
+            filter: { _id: BuyerId },
+            update: { $addToSet: { purchased: buyDocument } },
+          },
+        },
+        {
+          updateOne: {
+            filter: { _id: SellerId },
+            update: { $addToSet: { sell: sellDocument } },
+          },
+        },
+      ]);
 
       res.send({ mes: "sucessfully buyed" });
     } finally {
