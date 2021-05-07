@@ -277,13 +277,13 @@ router.post("/buy", (req, res) => {
         razorpay_orderId: razorpay_orderID,
         Time: new Date(),
       };
-      let sellDocument = {
-        ProductId: new ObjectID(ProductID),
-        BuyerId: new ObjectID(buyerID),
-        orderId: new ObjectID(orderID),
-        razorpay_orderId: razorpay_orderID,
-        Time: new Date(),
-      };
+      // let sellDocument = {
+      // ProductId: new ObjectID(ProductID),
+      // BuyerId: new ObjectID(buyerID),
+      // orderId: new ObjectID(orderID),
+      // razorpay_orderId: razorpay_orderID,
+      // Time: new Date(),
+      // };
       console.log(buyDocument);
       var BuyerId = new ObjectID(buyerID);
       var SellerId = new ObjectID(sellerID);
@@ -297,12 +297,6 @@ router.post("/buy", (req, res) => {
           updateOne: {
             filter: { _id: BuyerId },
             update: { $addToSet: { purchased: buyDocument } },
-          },
-        },
-        {
-          updateOne: {
-            filter: { _id: SellerId },
-            update: { $addToSet: { sell: sellDocument } },
           },
         },
       ]);
