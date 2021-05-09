@@ -3,6 +3,7 @@ var app = express.Router();
 const nodemailer = require("nodemailer");
 var Users = require("../Models/user");
 var Chat = require("../Models/ChatSchema");
+var Usercred = require("../Models/usercred");
 var Buy = require("../Models/userProducts");
 
 const bcrypt = require("bcrypt");
@@ -133,25 +134,28 @@ app.post("/login", async (req, res) => {
   const email = req.body.loginDetails.user_name;
   const pass = req.body.loginDetails.pass_word;
 
+  console.log(email, pass);
+
   var loggedin = false;
 
-  await Users.find({ email: email }).then((result) => {
-    bcrypt.compare(pass, result[0].password, function (err, password) {
-      console.log(result);
-      if (result[0].activated) {
-        console.log("Done");
-        loggedin = true;
-        res.json({ mes: "Welcome", usern: result[0]._id });
-      } else {
-        loggedin = false;
-        res.json({ mes: "regIssue" });
-      }
-
-      if (result === null) {
-        console.log("Does not exist");
-        res.json({ mes: "failed" });
-      }
-    });
+  await Usercred.findOne({ email: email }).then((result) => {
+    console.log(result);
+    if (result === null) {
+      console.log("Does not exist");
+      res.json({ mes: "failed" });
+    } else {
+      bcrypt.compare(pass, result.password, function (err, password) {
+        console.log(result, pass, password, result.password);
+        if (result.activated) {
+          console.log("Done");
+          loggedin = true;
+          res.json({ mes: "Welcome", usern: result._id });
+        } else {
+          loggedin = false;
+          res.json({ mes: "regIssue" });
+        }
+      });
+    }
   });
 });
 
@@ -167,53 +171,58 @@ app.post("/signup", async (req, res) => {
     let personDocument = {
       name: uname,
       sname: sname,
-      password: hash,
       mobile: mobile,
-      email: email,
       address: address,
     };
 
-    var user = new Users(personDocument);
+    let usercredentials = {
+      email: email,
+      password: hash,
+    };
 
-    Users.findOne({ email: email }).then(async (result) => {
+    var user = new Users(personDocument);
+    var usercred = new Usercred(usercredentials);
+
+    Usercred.findOne({ email: email }).then(async (result) => {
       console.log(result);
       if (result !== null) {
         console.log("User Existing");
       } else {
         try {
-          await user.save().then((result) => {
-            console.log("result is here");
+          await usercred.save().then(async (result) => {
+            console.log(result);
+            await user.save().then(() => {
+              console.log("result is here");
 
-            id = result._id;
+              var transporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                  user: "quickfinder419@gmail.com",
+                  pass: "Quickfinder@419",
+                },
+              });
 
-            var transporter = nodemailer.createTransport({
-              service: "gmail",
-              auth: {
-                user: "quickfinder746@gmail.com",
-                pass: "Quickfinder@746",
-              },
+              var mailOptions = {
+                from: "no reply",
+                to: email,
+                subject: "QUICK FINDER account activation.",
+                html:
+                  '<a href="http://localhost:4000/activate/' +
+                  result._id +
+                  '">Click on the link to activate your account.</a>',
+              };
+
+              transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                  console.log(error);
+                } else {
+                  console.log("Email sent: " + info.response);
+                }
+              });
             });
-
-            var mailOptions = {
-              from: "no reply",
-              to: email,
-              subject: "QUICK FINDER account activation.",
-              html:
-                '<a href="http://localhost:4000/activate/' +
-                result._id +
-                '">Click on the link to activate your account.</a>',
-            };
-
-            transporter.sendMail(mailOptions, function (error, info) {
-              if (error) {
-                console.log(error);
-              } else {
-                console.log("Email sent: " + info.response);
-              }
-            });
+            // console.log(id);
+            // res.json({ Id: id });
           });
-          // console.log(id);
-          // res.json({ Id: id });
         } catch (err) {
           console.log(err.stack);
         }
@@ -223,7 +232,8 @@ app.post("/signup", async (req, res) => {
 });
 
 app.get("/activate/:id", async (req, res) => {
-  await Users.updateOne(
+  console.log(req.params.id);
+  await Usercred.updateOne(
     { _id: ObjectId(req.params.id) },
     { $set: { activated: true } }
   ).then((result) => {

@@ -8,21 +8,11 @@ const UserSchema = new schema({
     "sname": {
         type: String
     },
-    "password": {
-        type: String
-    },
     "mobile": {
         type: Number
     },
-    "email": {
-        type: String
-    },
     "address": {
         type: String
-    },
-    "activated": {
-        type: Boolean,
-        default: false
     },
     "chatid": {
         type: Object,
