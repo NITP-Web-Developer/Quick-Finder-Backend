@@ -237,8 +237,9 @@ router.post("/userbuyproduct", (req, res) => {
               purchased.ProductId = result[0].purchased[i].ProductId.toString();
               purchased.BuyerId = result[0].purchased[i].SellerId.toString();
               purchased.orderId = result[0].purchased[i].orderId.toString();
-              purchased.razorpay_orderId =
-                result[0].purchased[i].razorpay_orderId.toString();
+              purchased.razorpay_orderId = result[0].purchased[
+                i
+              ].razorpay_orderId.toString();
               purchased.Time = result[0].purchased[i].Time.toString();
               array.push(purchased);
             }
@@ -375,32 +376,6 @@ router.post("/SellStatus", (req, res) => {
       );
 
       res.send({ mes: "sucessfully change sold status" });
-    } finally {
-    }
-  }
-  run().catch(console.dir);
-});
-
-router.post("/accountDetails", (req, res) => {
-  var userId = req.body.obj.username;
-  console.log(req.body.obj.username);
-  async function run() {
-    try {
-      await mongodbclient.connect();
-      console.log("connection is established !");
-      var database = mongodbclient.db("Quick_Finder");
-      var Buy = database.collection("users");
-
-      var Id = new ObjectID(userId);
-
-      await Buy.findOne({ _id: Id })
-        .then((result) => {
-          console.log(result);
-          res.status(200).json({ user: result });
-        })
-        .catch((err) => {
-          res.status(500).json({ item: null });
-        });
     } finally {
     }
   }

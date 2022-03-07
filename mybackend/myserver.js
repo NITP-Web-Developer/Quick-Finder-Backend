@@ -36,6 +36,35 @@ router.post("/filter", function (req, res) {
   }
   run().catch(console.dir);
 });
+router.post("/getData", function (req, res) {
+  const request = req;
+  var search_id = req.body.obj.search_id;
+  async function run() {
+    await client.connect();
+    // console.log("Connected correctly to server");
+    const db = client.db(dbName);
+    var array=[];
+    array = await db.collection("sellProducts").findOne({_id:ObjectId(search_id)});
+    // console.log(array);
+    res.json({ mes: array });
+  }
+  run().catch(console.dir);
+});
+router.post("/getUserData", function (req, res) {
+  const request = req;
+  var user = req.body.obj.username;
+  async function run() {
+    await client.connect();
+    // console.log("Connected correctly to server");
+    const db = client.db(dbName);
+    var array=[];
+    array = await db.collection("users").findOne({_id:ObjectId(user)});
+    // console.log(array);
+    res.json({ mes: array });
+  }
+  run().catch(console.dir);
+});
+
 router.post("/getDetails", function (req, res) {
   function filterByValue(array, string) {
     return array.filter((o) =>
@@ -44,6 +73,7 @@ router.post("/getDetails", function (req, res) {
       )
     );
   }
+
   var search_input = req.body.obj.search_input;
   console.log("Ya its running ");
   const request = req;
