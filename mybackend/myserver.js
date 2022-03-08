@@ -64,16 +64,28 @@ router.post("/getUserData", function (req, res) {
   }
   run().catch(console.dir);
 });
-
-router.post("/getDetails", function (req, res) {
-  function filterByValue(array, string) {
-    return array.filter((o) =>
-      Object.keys(o).some((k) =>
-        o[k].toLowerCase().includes(string.toLowerCase())
-      )
-    );
+function filterByValue(array, string) {
+  return array.filter((o) =>
+    Object.keys(o).some((k) =>
+      o[k].toLowerCase().includes(string.toLowerCase())
+    )
+  );
+}
+function shuffleArray(array) {
+  for (var i = array.length - 1; i > 0; i--) {
+  
+      // Generate random number
+      var j = Math.floor(Math.random() * (i + 1));
+                  
+      var temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
   }
-
+      
+  return array;
+}
+router.post("/getDetails", function (req, res) {
+  
   var search_input = req.body.obj.search_input;
   console.log("Ya its running ");
   const request = req;
@@ -83,9 +95,10 @@ router.post("/getDetails", function (req, res) {
     const db = client.db(dbName);
     var array = [];
     db.collection("sellProducts")
-      .find()
-      .toArray(function (err, result) {
+    .find()
+    .toArray(function (err, result) {
         if (err) throw err;
+        result= shuffleArray(result)
         for (var i = 0; i < result.length; i++) {
           console.log(result[i].product_name);
           var obj = {};
@@ -111,7 +124,7 @@ router.post("/getDetails", function (req, res) {
           // });
           array.push(obj);
         }
-        var anoarray = filterByValue(array, search_input);
+        var anoarray = array;
         anoarray = anoarray.concat(array);
         res.json({ mes: anoarray });
       });
